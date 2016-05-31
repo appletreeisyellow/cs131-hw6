@@ -104,6 +104,11 @@ putdown(_, _).
 
 /* ----- pickup action ----- */
 
+/* Base case */
+action(Start, Action, End) :- 
+	Start = End,
+	Action = [].
+
 /* pickup from stack1 */
 action(Start, Action, End) :- 
 	Start = world([H1|T1], Stack2, Stack3, none),
@@ -151,9 +156,11 @@ action(Start, Action, End) :-
 
 
 
+/* Base case: start world is the same as goal world */
+blocksworld(StartWorld, [], StartWorld).
 
-blocksworld(world(stack1, stack2, stack3, none), [], world(stack1, stack2, stack3, none)).
 
+/* Recursive case: */
 blocksworld(StartWorld, [Action|Actions], GoalWorld) :-
 	action(StartWorld, Action, CurrentWorld), blocksworld(CurrentWorld, Actions, GoalWorld).
 
