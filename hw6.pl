@@ -29,52 +29,72 @@ subseq([H|R], [H|T]) :-
 
 /* 3. */
 
-single_add(Sum, Cout, Cin, N1, N2) :-
-	Sum #= (Cin + N1 + N2) rem 10,
-	Cout #= Cin + N1 + N2 // 10.
-
 va_helpper(New_List, Prev_List, Cin, Word1, Word2, Word3) :-
-	Word1 == [], Word2 == [], Word3 == [] -> 
-		append(Prev_List, [], New_List);
+	Word1 \== [], Word2 \== [] -> 
+		Word1 = [H1|T1],
+		Word2 = [H2|T2],
+		Word3 = [H3|T3],
+		H3 #= (Cin + H1 + H2) rem 10,
+		Cout #= (Cin + H1 + H2) // 10,
+		append(Prev_List, [H3], Current_List), 
+		va_helpper(New_List, Current_List, Cout, T1, T2, T3);
+
+	Word1 == [], Word2 \== [] -> 
+		Word2 = [H2|T2],
+		Word3 = [H3|T3],
+		H3 #= (Cin + H2) rem 10,
+		Cout #= (Cin + H2) // 10, 
+		append(Prev_List, [H3], Current_List),
+		va_helpper(New_List, Current_List, Cout, [], T2, T3);
+
+	Word1 \== [], Word2 == [] -> 
+		Word1 = [H1|T1],
+		Word3 = [H3|T3],
+		H3 #= (Cin + H1) rem 10,
+		Cout #= (Cin + H1) // 10,
+		append(Prev_List, [H3], Current_List),
+		va_helpper(New_List, Current_List, Cout, T1, [], T3);
 
 	Word1 == [], Word2 == [], Word3 \== [] -> 
 		Word3 = [Cin],
 		append(Prev_List, Word3, New_List);
 
-	Word1 == [], Word2 \== [] -> 
-		Word2 = [H2|T2],
-		Word3 = [H3|T3],
-		single_add(H3, Co, Cin, 0, H2), 
-		append(Prev_List, [H3], Current_List),
-		va_helpper(New_List, Current_List, Co, [], T2, T3);
-
-	Word1 \== [], Word2 == [] -> 
-		Word1 = [H1|T1],
-		Word3 = [H3|T3],
-		single_add(H3, Co, Cin, H1, 0),
-		append(Prev_List, [H3], Current_List),
-		va_helpper(New_List, Current_List, Co, T1, [], T3);
+	Word1 == [], Word2 == [], Word3 == [] -> 
+		Prev_List = New_List.
 	
-	T1 \== [], T2 \== [] -> 
-		Word1 = [H1|T1],
-		Word2 = [H2|T2],
-		Word3 = [H3|T3],
-		single_add(H3, Co, Cin, H1, H2), 
-		append(Prev_List, [H3], Current_List), 
-		va_helpper(New_List, Current_List, Co, T1, T2, T3).
+/* Base Case */
+verbalarithmetic(Result, [W1], [W2], [W3]) :-
+	fd_domain(Result, 0, 9),
+	W3 #= W1 + W2,
+	fd_labeling(Result),
+	W1 \== 0,
+	W2 \== 0,
+	W3 \== 0,
+	fd_all_different(Result).
+
+verbalarithmetic(Result, [W1], [W2], [W3h, W3t]) :-
+	fd_domain(Result, 0, 9),
+	W3t #= (W1 + W2) rem 10,
+	W3h #= (W1 + W2) // 10,
+	fd_labeling(Result),
+	(W1 \== 0),
+	(W2 \== 0),
+	(W3h \== 0),
+	fd_all_different(Result). 
 
 
 verbalarithmetic(Result, [H1|T1], [H2|T2], [H3|T3]) :-
 	fd_domain(Result, 0, 9),
+	fd_domain(H1, 1, 9),
+	fd_domain(H2, 1, 9),
+	fd_domain(H3, 1, 9),
 	reverse([H1|T1], Rev_Word1),
 	reverse([H2|T2], Rev_Word2),
 	reverse([H3|T3], Rev_Word3),
 	va_helpper(Rev_Word3, [], 0, Rev_Word1, Rev_Word2, Rev_Word3),
-	fd_all_different(Result),
-	H1 \== 0,
-	H2 \== 0,
-	H3 \== 0,
-	fd_labeling(Result).
+	fd_labeling(Result),
+	fd_all_different(Result).
+
 
 
 
